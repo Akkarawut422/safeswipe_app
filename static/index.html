@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SafeSwipe | Fraud Detection & Model Evaluation</title>
+<style>
+:root{--navy:#111b35;--blue:#2864e8;--blue2:#eaf1ff;--ink:#17233f;--muted:#77839b;--line:#e5eaf3;--bg:#f4f7fc;--red:#e94b5b;--green:#20a36b;--amber:#d68a16;--card:#fff}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,"Noto Sans Thai",Tahoma,Arial,sans-serif;background:var(--bg);color:var(--ink)}button,input,select{font:inherit}button{cursor:pointer;border:0;border-radius:10px;padding:10px 15px;font-weight:700;transition:.15s}button:hover{filter:brightness(.97);transform:translateY(-1px)}button:disabled{opacity:.45;cursor:not-allowed;transform:none}.primary{background:var(--blue);color:white}.secondary{background:white;color:var(--blue);border:1px solid #cbd9fb}.success{background:var(--green);color:white}.ghost{background:#f3f6fc;color:#52617d;border:1px solid var(--line)}.danger{background:#fff0f1;color:#c93648;border:1px solid #ffd7dc}
+.app{display:flex;min-height:100vh}
+.sidebar{width:238px;background:var(--navy);color:#d9e2f5;padding:22px 14px;display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto}
+.brand{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:800;padding:4px 10px 26px}.shield{display:grid;place-items:center;background:#244b9b;color:white;width:39px;height:39px;border-radius:13px;font-size:22px}.brand small{display:block;font-size:11px;color:#9eaccb;font-weight:500}.nav{display:grid;gap:6px}.nav button{color:#b9c5df;text-align:left;background:transparent;padding:12px 13px;font-weight:600}.nav button.active,.nav button:hover{background:#254c9d;color:white}.navlabel{font-size:10px;color:#7f91b8;letter-spacing:1px;padding:17px 13px 4px}.sidefoot{margin-top:auto;border:1px solid #2b3958;border-radius:12px;padding:13px;color:#9eaccb;font-size:11px;line-height:1.7}.main{flex:1;min-width:0;padding:28px 30px 40px}.top{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:22px}.eyebrow{font-size:11px;color:var(--blue);font-weight:800;letter-spacing:.08em}.top h1{margin:5px 0;font-size:26px}.sub{color:var(--muted);font-size:13px}.status{background:#e8f8f0;color:#178956;border-radius:30px;padding:8px 13px;font-size:11px;font-weight:800;white-space:nowrap}.status:before{content:"";display:inline-block;width:7px;height:7px;background:#24b879;border-radius:50%;margin-right:7px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:18px;box-shadow:0 3px 12px #15264a05}.section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;font-weight:800;font-size:15px}.section-title small{font-size:11px;color:var(--muted);font-weight:500}.muted{color:var(--muted)}.tiny{font-size:11px;color:var(--muted)}.info{padding:13px 15px;background:#f2f6ff;border:1px solid #e0eaff;border-radius:11px;color:#52617d;font-size:12px;line-height:1.7;margin-bottom:15px}.warning{background:#fff8e9;border-color:#f6e5bd;color:#805b19}.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-bottom:16px}.kpi{display:flex;gap:12px;align-items:center}.kicon{width:40px;height:40px;border-radius:12px;background:var(--blue2);display:grid;place-items:center;font-size:19px}.kicon.red{background:#fff0f1}.kicon.green{background:#e8f8f0}.kicon.amber{background:#fff5e3}.klabel{font-size:11px;color:var(--muted)}.kvalue{font-size:24px;font-weight:800;margin-top:3px}.kfoot{font-size:10px;color:#929db0;margin-top:3px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:15px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.tabscreen{display:none}.tabscreen.active{display:block}.drop{border:1.5px dashed #a8bef5;background:#f8faff;border-radius:12px;padding:22px 14px;text-align:center}.drop.drag{background:#eaf1ff;border-color:var(--blue)}.drop strong{display:block;font-size:13px}.drop p{font-size:11px;color:var(--muted);margin:7px 0 13px}.file-name{font-size:11px;color:var(--green);margin-top:9px;min-height:15px}.formrow{display:flex;gap:10px;margin-top:13px;flex-wrap:wrap}.formrow label,.field{font-size:11px;color:var(--muted);display:grid;gap:6px;flex:1;min-width:130px}.formrow select,.formrow input,.field input,.field select{border:1px solid var(--line);border-radius:9px;padding:10px;background:white;color:var(--ink);width:100%}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.actions button{flex:1}.metricgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.metric{background:#f7f9fd;border:1px solid #edf0f7;border-radius:11px;padding:12px}.metric label{font-size:10px;color:var(--muted)}.metric strong{display:block;font-size:20px;margin-top:5px}.metric small{font-size:10px;color:var(--muted)}.rangehead{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:700}.rangehead b{color:var(--blue);font-size:18px}input[type=range]{width:100%;accent-color:var(--blue);margin:10px 0 3px}.rangeticks{display:flex;justify-content:space-between;color:#9aa5b8;font-size:10px}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:11px;white-space:nowrap}th{text-align:left;color:#8793a8;font-weight:700;background:#f8faff;padding:11px}td{padding:11px;border-bottom:1px solid #edf0f6}tr:last-child td{border-bottom:0}.pill{font-size:10px;font-weight:800;border-radius:20px;padding:4px 8px;background:#fff0f1;color:#d63d4c}.pill.good{background:#e8f8f0;color:#178956}.pill.warn{background:#fff5e3;color:#a66a0b}.pill.blue{background:#eaf1ff;color:#2864e8}.modelcard{border:1px solid var(--line);border-radius:12px;padding:14px;background:#fff}.modelhead{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:800;font-size:13px}.modeldesc{font-size:10px;color:var(--muted);line-height:1.6;margin:8px 0}.modelmeta{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);border-top:1px solid var(--line);padding-top:9px}.matrix{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.matrix div{border-radius:10px;padding:13px;text-align:center}.matrix strong{display:block;font-size:22px}.matrix span{font-size:10px}.tp,.tn{background:#eaf8f1;color:#16794d}.fp,.fn{background:#fff0f1;color:#c93648}.empty{padding:25px;text-align:center;color:var(--muted);font-size:12px}.toast{position:fixed;bottom:20px;right:22px;background:#14213e;color:white;padding:12px 17px;border-radius:11px;box-shadow:0 10px 30px #0002;display:none;font-size:12px;z-index:5}.toast.show{display:block}.pagehead{margin-bottom:15px}.pagehead h2{font-size:17px;margin:0 0 5px}.pagehead p{font-size:12px;color:var(--muted);margin:0}.footnote{font-size:10px;color:#8b96aa;line-height:1.6;margin-top:10px}.hide{display:none!important}
+.mode-switch{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#e9effa;padding:6px;border-radius:12px;margin-bottom:15px}
+.mode-switch button{background:transparent;color:#52617d;padding:11px 14px;border-radius:9px;font-size:13px}
+.mode-switch button.active{background:var(--card);color:var(--blue);box-shadow:0 2px 8px #15264a12}
+.thr-box{background:#f8faff;border:1px solid #e2ecff;border-radius:12px;padding:14px;margin-top:13px}
+.btn-sm{padding:6px 11px;font-size:11px;border-radius:8px}
+@media(max-width:1050px){.sidebar{width:205px}.main{padding:22px 18px}.kpis{grid-template-columns:repeat(2,1fr)}.metricgrid{grid-template-columns:repeat(3,1fr)}.grid4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:680px){.app{display:block}.sidebar{width:100%;padding:12px;display:block;position:static;height:auto;overflow-y:visible}.brand{padding:4px 8px 12px}.nav{display:flex;overflow:auto}.navlabel,.sidefoot{display:none}.nav button{white-space:nowrap;padding:9px;font-size:11px}.main{padding:17px 11px}.top h1{font-size:21px}.status{font-size:9px}.grid2,.grid3,.mode-switch{grid-template-columns:1fr}.kpis{gap:8px}.card{padding:13px}.kvalue{font-size:20px}.metricgrid{grid-template-columns:repeat(2,1fr)}.grid4{grid-template-columns:repeat(2,1fr)}}
+</style></head>
+<body><div class="app">
+<aside class="sidebar"><div class="brand"><div class="shield">✓</div><div>SafeSwipe<small>Fraud Detection & Evaluation</small></div></div>
+<nav class="nav">
+<button class="active" data-page="dashboard">▦ แดชบอร์ด</button>
+<div class="navlabel">MODEL MANAGEMENT</div>
+<button data-page="models">▣ โมเดลที่พร้อมใช้งาน</button>
+<div class="navlabel">EVALUATION</div>
+<button data-page="testing">⇧ ทดสอบโมเดล</button>
+<button data-page="history">◷ ประวัติและรายงาน</button>
+<div class="navlabel">SYSTEM</div><button data-page="about">ⓘ เกี่ยวกับระบบ</button>
+</nav><div class="sidefoot"><span id="sideStatus">กำลังตรวจสอบ Backend…</span><br><b style="color:#e2eaff">Python + FastAPI + AI</b></div></aside>
+<main class="main"><header class="top"><div><div class="eyebrow">ระบบวิเคราะห์ธุรกรรมบัตรเครดิต</div><h1 id="pageTitle">แดชบอร์ด SafeSwipe</h1><div class="sub" id="pageSub">ภาพรวมการตรวจจับและประเมินประสิทธิภาพโมเดล</div></div><div class="status" id="connStatus">กำลังเชื่อมต่อ…</div></header>
+
+<section id="dashboard" class="tabscreen active">
+<div class="info"><b>ภาพรวมผลการประเมิน:</b> แสดงผลเปรียบเทียบโมเดลทั้ง 4 ตัวจากการทดสอบล่าสุด โดยใช้ Test Dataset ชุดเดียวกัน</div>
+<div class="kpis">
+<div class="card"><div class="kpi"><div class="kicon">▤</div><div><div class="klabel">ธุรกรรมที่ทดสอบ</div><div class="kvalue" id="dashTotal">—</div><div class="kfoot">จำนวนแถวใน Test Dataset</div></div></div></div>
+<div class="card"><div class="kpi"><div class="kicon red">⚠</div><div><div class="klabel">Fraud ที่ตรวจพบ</div><div class="kvalue" id="dashFraud">—</div><div class="kfoot">จากโมเดลที่มีต้นทุนต่ำสุด</div></div></div></div>
+<div class="card"><div class="kpi"><div class="kicon green">✓</div><div><div class="klabel">Recall สูงสุด</div><div class="kvalue" id="dashRecall">—</div><div class="kfoot">ผลจากโมเดลที่ดีที่สุดด้าน Recall</div></div></div></div>
+<div class="card"><div class="kpi"><div class="kicon amber">฿</div><div><div class="klabel">ต้นทุนต่ำสุด</div><div class="kvalue" id="dashCost">—</div><div class="kfoot" id="dashBestModel">รอผลทดสอบ</div></div></div></div>
+</div>
+<div class="card" id="recCard" style="margin-bottom:15px"><div class="section-title">โมเดลที่แนะนำ <small id="recNote">รอผลทดสอบ</small></div><div id="recBody" class="empty">ยังไม่มีผลทดสอบ กด “ทดสอบทุกโมเดล” ในเมนูทดสอบโมเดลเพื่อให้ระบบแนะนำ</div></div>
+<div class="card" style="margin-bottom:15px"><div class="section-title">ผลเปรียบเทียบโมเดลทั้ง 4 ตัว <small id="dashEvalStatus">ยังไม่มีผลทดสอบ</small></div><div class="tablewrap"><table><thead><tr><th>Model</th><th>Precision</th><th>Recall</th><th>F1-score</th><th>FP</th><th>FN</th><th>Total Cost</th><th>Threshold</th></tr></thead><tbody id="dashboardComparison"><tr><td colspan="8" class="empty">ไปที่เมนูทดสอบโมเดล เลือกโมเดลและรันทดสอบก่อน</td></tr></tbody></table></div><div class="footnote">ผลเปรียบเทียบจะแสดงเฉพาะโมเดลที่ผ่านการทดสอบแล้ว</div></div>
+<div class="grid2">
+<div class="card"><div class="section-title">สถานะโมเดล <small>Model Registry</small></div><div id="dashModelStatus" class="empty">ยังไม่ได้โหลดสถานะโมเดล</div><div class="footnote">สถานะมาจาก Backend โดยตรง</div></div>
+<div class="card"><div class="section-title">คำอธิบายผลลัพธ์</div><p class="tiny">TP = ตรวจพบ Fraud ถูกต้อง · TN = ตรวจพบ Normal ถูกต้อง</p><p class="tiny">FP = แจ้งเตือนธุรกรรมปกติผิด · FN = พลาดธุรกรรม Fraud</p><p class="tiny">Precision = TP / (TP + FP)</p><p class="tiny">Recall = TP / (TP + FN)</p><p class="tiny">Total Cost = ยอดเงินของโกงที่หลุด (FN) + FP Cost × FP</p></div>
+</div></section>
+
+<section id="models" class="tabscreen"><div class="pagehead"><h2>โมเดลที่พร้อมใช้งาน</h2><p>ตรวจสอบโมเดลที่ฝึกจาก Python และบันทึกไว้ในโฟลเดอร์ artifacts</p></div><div class="info warning"><b>หมายเหตุ:</b> ตามสถาปัตยกรรม SafeSwipe การฝึกโมเดลทำแบบ Offline ด้วย Python หน้านี้ใช้ตรวจสอบสถานะโมเดลที่พร้อมให้ Backend โหลด ไม่ได้ฝึกโมเดลจริงใน Browser</div><div class="grid2" id="modelCards">
+<div class="modelcard"><div class="modelhead">Autoencoder <span class="pill warn">ตัวอย่าง</span></div><div class="modeldesc">เรียนรู้รูปแบบธุรกรรมปกติ แล้วใช้ Reconstruction Error เป็นคะแนนความผิดปกติ</div><div class="modelmeta"><span>ประเภท: Unsupervised</span><span>Score: Reconstruction Error</span></div></div>
+<div class="modelcard"><div class="modelhead">Logistic Regression <span class="pill warn">ตัวอย่าง</span></div><div class="modeldesc">จำแนกธุรกรรมด้วยข้อมูล Class และให้ค่าความน่าจะเป็นของ Fraud</div><div class="modelmeta"><span>ประเภท: Supervised</span><span>Score: Fraud Probability</span></div></div>
+<div class="modelcard"><div class="modelhead">Random Forest <span class="pill warn">ตัวอย่าง</span></div><div class="modeldesc">รวมผลจาก Decision Trees หลายต้นเพื่อทำนายว่าเป็น Fraud หรือ Normal</div><div class="modelmeta"><span>ประเภท: Supervised</span><span>Score: Fraud Probability</span></div></div>
+<div class="modelcard"><div class="modelhead">Isolation Forest <span class="pill warn">ตัวอย่าง</span></div><div class="modeldesc">แยกข้อมูลที่ผิดปกติออกจากข้อมูลส่วนใหญ่ด้วยการสุ่มแบ่งข้อมูล</div><div class="modelmeta"><span>ประเภท: Unsupervised</span><span>Score: Anomaly Score</span></div></div>
+</div><div class="card" style="margin-top:15px"><div class="section-title">ไฟล์โมเดลที่ Backend ต้องโหลด</div><div class="tablewrap"><table><thead><tr><th>โมเดล</th><th>แหล่งที่มา</th><th>สถานะ</th><th>Threshold</th></tr></thead><tbody id="artifactRows"></tbody></table></div><div class="footnote">ตอนนี้ Backend เทรน Logistic Regression ตอนเริ่มเซิร์ฟเวอร์ (ยังไม่บันทึกเป็นไฟล์) โมเดลอื่นจะเพิ่มภายหลัง</div></div></section>
+
+<section id="testing" class="tabscreen">
+<div class="pagehead"><h2>ทดสอบโมเดลและประเมินผล</h2><p>อัปโหลดไฟล์ ปรับ Threshold หรือใช้ค่าแนะนำ (ต้นทุนต่ำสุด) แล้วดูผลทันที</p></div>
+<div class="info warning hide" id="errBox"></div><div class="info"><b>หมายเหตุ:</b> ไฟล์ต้องมีคอลัมน์ V1–V28 และ Amount ถ้ามีคอลัมน์ Class (0/1) จะคำนวณ TP/FP/FN, Precision, Recall และต้นทุนได้ ถ้าไม่มีจะแสดงจำนวนแจ้งเตือนและค่าตรวจสอบโดยประมาณ</div>
+
+<div class="mode-switch hide">
+  <button id="modeSingleBtn" class="active" type="button">◉ เทรน/ทดสอบทีละโมเดล</button>
+  <button id="modeAllBtn" type="button">☷ เทรน/ทดสอบโมเดลทั้งหมด (4 โมเดล)</button>
+</div>
+
+<div class="grid2">
+  <div class="card">
+    <div class="section-title">1. เลือกไฟล์ที่ต้องการวิเคราะห์</div>
+    <div class="drop" id="dropTest">
+      <strong>เลือกไฟล์ Test CSV</strong>
+      <p>ไฟล์ที่ไม่เคยใช้ฝึกโมเดลมาก่อน</p>
+      <button class="primary" id="browseTest" type="button">เลือกไฟล์ CSV</button>
+      <div class="file-name" id="testFile">ยังไม่ได้เลือกไฟล์</div>
+    </div>
+    <div class="actions">
+      <button class="secondary" id="demoTest" type="button">ลองข้อมูลตัวอย่าง (สุ่มจากชุด Test)</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="section-title">2. การตั้งค่าต้นทุนความเสียหาย</div>
+    <div class="formrow">
+      <label>FP Cost (ต่อการแจ้งเตือนผิด 1 ครั้ง)<input id="fpCost" type="number" min="0" value="50" step="1"></label>
+      <label>หน่วยเงิน<input value="ยูโร (สมมติ)" disabled></label>
+    </div>
+    <div class="footnote">ค่า Threshold แนะนำ (Auto) คือค่าที่ทำให้ต้นทุนรวมต่ำสุดบนชุด Validation ต้นทุนรวม = ยอดเงินของโกงที่หลุด + FP Cost × จำนวนแจ้งเตือนผิด (คำนวณที่ Backend)</div>
+  </div>
+</div>
+
+<!-- โหมดที่ 1: เทรน/ทดสอบทีละตัว -->
+<div id="singleModePanel" class="card" style="margin-bottom:15px">
+  <div class="section-title">3. เลือกโมเดลและ Threshold <small id="singleThrBadge">Threshold เริ่มต้น</small></div>
+  <div class="grid2" style="margin-bottom:0;align-items:end">
+    <div>
+      <div class="formrow" style="margin-top:0">
+        <label>เลือกโมเดลที่ต้องการทดสอบ
+          <select id="testModel">
+            <option>Autoencoder</option>
+            <option>Logistic Regression</option>
+            <option>Random Forest</option>
+            <option>Isolation Forest</option>
+          </select>
+        </label>
+      </div>
+      <div class="actions" style="margin-top:14px">
+        <button class="secondary" id="singleAutoThrBtn" type="button">⚡ หา Threshold แบบ Auto</button>
+        <button class="primary" id="runSingleBtn" type="button">▶ วิเคราะห์ไฟล์</button>
+      </div>
+    </div>
+    <div class="thr-box" style="margin-top:0">
+      <div class="rangehead">
+        <span>Threshold (<span id="singleModelNameLabel">Autoencoder</span>)</span>
+        <b id="singleThrValue">0.50</b>
+      </div>
+      <input id="singleThrSlider" type="range" min="1" max="1000" value="500">
+      <div class="rangeticks">
+        <span>0.00 · แจ้งเตือนมาก (เสี่ยง FP สูง)</span>
+        <span>1.00 · แจ้งเตือนน้อย (เสี่ยง FN สูง)</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- โหมดที่ 2: เทรน/ทดสอบทุกโมเดล -->
+<div id="allModePanel" class="card hide" style="margin-bottom:15px">
+  <div class="section-title">
+    <span>3. ตั้งค่าเทรน/ทดสอบทุกโมเดล (ปรับแยกแต่ละโมเดล)</span>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="secondary btn-sm" id="allAutoThrBtn" type="button">⚡ หา Threshold แบบ Auto ทุกโมเดล</button>
+      <button class="success btn-sm" id="runEveryBtn" type="button">▶ เทรน/ทดสอบทุกโมเดล</button>
+    </div>
+  </div>
+  <div class="grid2" id="allModelsThrGrid" style="margin-bottom:0"></div>
+  <div class="footnote">คุณสามารถเลื่อนปรับค่า Threshold ของแต่ละโมเดลแยกกัน หรือกดปุ่ม Auto ของแต่ละโมเดลได้โดยอิสระ</div>
+</div>
+
+<div class="card" style="margin-bottom:15px">
+  <div class="section-title">ผลการทดสอบโมเดล <small id="evalStatus">ยังไม่มีผลทดสอบ</small></div>
+  <div class="metricgrid">
+    <div class="metric"><label>Precision</label><strong id="selectedPrecision">—</strong></div>
+    <div class="metric"><label>Recall</label><strong id="selectedRecall">—</strong></div>
+    <div class="metric"><label>F1-score</label><strong id="selectedF1">—</strong></div>
+    <div class="metric"><label>FP</label><strong id="selectedFP">—</strong></div>
+    <div class="metric"><label>FN</label><strong id="selectedFN">—</strong></div>
+  </div>
+  <div class="footnote"><span id="resultNote">ผลคำนวณที่ Backend ด้วยโมเดลที่เทรนไว้จริง</span></div>
+</div>
+
+<div class="grid2">
+  <div class="card">
+    <div class="section-title">Confusion Matrix <small id="matrixModelLabel">เลือกโมเดลหลังทดสอบ</small></div>
+    <div class="formrow" style="margin:0 0 12px">
+      <label>เลือกโมเดลเพื่อดูรายละเอียด
+        <select id="matrixModel">
+          <option>Autoencoder</option>
+          <option>Logistic Regression</option>
+          <option>Random Forest</option>
+          <option>Isolation Forest</option>
+        </select>
+      </label>
+    </div>
+    <div class="matrix">
+      <div class="tp"><strong id="mTP">—</strong><span>TP · Fraud ตรวจพบถูก</span></div>
+      <div class="fp"><strong id="mFP">—</strong><span>FP · แจ้งเตือนผิด</span></div>
+      <div class="fn"><strong id="mFN">—</strong><span>FN · พลาด Fraud</span></div>
+      <div class="tn"><strong id="mTN">—</strong><span>TN · Normal ถูกต้อง</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="section-title">รายละเอียดตัวชี้วัด <small id="detailThrLabel">โมเดลที่เลือก</small></div>
+    <div class="metricgrid" style="grid-template-columns:repeat(2,1fr)">
+      <div class="metric"><label>Precision</label><strong id="detailPrecision">—</strong></div>
+      <div class="metric"><label>Recall</label><strong id="detailRecall">—</strong></div>
+      <div class="metric"><label>F1-score</label><strong id="detailF1">—</strong></div>
+      <div class="metric"><label>Total Cost</label><strong id="detailCost">—</strong></div>
+    </div>
+    <div class="footnote">เมื่อปรับ Threshold ของโมเดลที่ทดสอบแล้ว ค่าตัวชี้วัดและตารางด้านล่างจะอัปเดตตามทันที</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="section-title">รายการที่ถูกแจ้งเตือน (เรียงตามคะแนน) <button class="secondary" id="exportTransactions" type="button">ส่งออก CSV</button></div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Transaction</th><th>Actual Class</th><th>Predicted</th><th>Score</th><th>สูงกว่าปกติ (Val)</th><th>ผลเปรียบเทียบ</th></tr></thead>
+      <tbody id="transactionRows"><tr><td colspan="6" class="empty">ยังไม่มีรายการ</td></tr></tbody>
+    </table>
+  </div>
+</div>
+</section>
+
+<section id="history" class="tabscreen"><div class="pagehead"><h2>ประวัติและรายงาน</h2><p>สรุปประวัติล่าสุดแยกตามโมเดล และตารางประวัติรวมด้านล่าง</p></div><div class="grid4" id="historyModelCards">
+<div class="modelcard"><div class="modelhead">Autoencoder</div><div class="modeldesc" id="hist-Autoencoder">ยังไม่มีประวัติ</div></div>
+<div class="modelcard"><div class="modelhead">Logistic Regression</div><div class="modeldesc" id="hist-Logistic Regression">ยังไม่มีประวัติ</div></div>
+<div class="modelcard"><div class="modelhead">Random Forest</div><div class="modeldesc" id="hist-Random Forest">ยังไม่มีประวัติ</div></div>
+<div class="modelcard"><div class="modelhead">Isolation Forest</div><div class="modeldesc" id="hist-Isolation Forest">ยังไม่มีประวัติ</div></div>
+</div><div class="card" style="margin-top:15px"><div class="section-title">ประวัติการทดสอบ <button class="secondary" id="exportReport" type="button">ส่งออกรายงาน CSV</button></div><div class="tablewrap"><table><thead><tr><th>เวลา</th><th>Dataset</th><th>Model</th><th>Threshold</th><th>FP</th><th>FN</th><th>Total Cost</th></tr></thead><tbody id="historyRows"><tr><td colspan="7" class="empty">ยังไม่มีประวัติการทดสอบ</td></tr></tbody></table></div></div></section>
+
+<section id="about" class="tabscreen"><div class="pagehead"><h2>เกี่ยวกับ SafeSwipe</h2><p>ระบบตรวจจับการทุจริตและประเมินประสิทธิภาพโมเดล AI</p></div><div class="card"><h3 style="margin-top:0">สถาปัตยกรรมที่แนะนำ</h3><div class="info">OFFLINE: creditcard.csv → แบ่ง Train / Validation / Test → Preprocess → ฝึก Autoencoder, Logistic Regression, Random Forest, Isolation Forest → เลือก Threshold จาก Validation → บันทึก artifacts</div><div class="info">ONLINE: Browser HTML → FastAPI → โหลด Preprocessor และโมเดลที่บันทึกไว้ → ทำนายคะแนน → คำนวณผลประเมินและต้นทุน → ส่งผลกลับ Dashboard</div><h3>สูตรต้นทุน</h3><p class="tiny">ต้นทุนรวม = ยอดเงินของโกงที่หลุด (FN) + FP Cost × จำนวนแจ้งเตือนผิด (FP) · เงินที่ป้องกันได้สุทธิ = ยอดโกงทั้งหมด − ต้นทุนรวม · คำนวณที่ Backend ที่เดียว</p><h3>สมมติฐานและข้อจำกัด</h3><ul class="tiny" style="line-height:2"><li>ข้อมูลจริงคือธุรกรรม 2 วัน ปี 2013 ฟีเจอร์ V1–V28 ผ่าน PCA</li><li>หน่วยเงินสมมติเป็นยูโร และ FP Cost เป็นค่าสมมติ</li><li>ไฟล์ตัวอย่างมีสัดส่วนโกงสูงกว่าจริง เงินที่ป้องกันได้จึงสูงกว่าความจริง</li><li>ตอนนี้มีโมเดลพร้อมใช้งาน 1 ตัว (Logistic Regression)</li><li>ตัวเลขหลักในรายงานต้องมาจากผล Test จริงของสคริปต์ ไม่ใช่ไฟล์ตัวอย่าง</li></ul></div></section>
+</main></div><div class="toast" id="toast"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const MODEL = 'Logistic Regression';
+const ALL = ['Autoencoder', 'Logistic Regression', 'Random Forest', 'Isolation Forest'];
+let meta = null, sid = null, file = null, useSample = false, srcName = '';
+let thr = 0.5, thrSrc = 'default', cur = null, hist = [], timers = {};
+
+const fmt = (n, d = 0) => Number(n || 0).toLocaleString('th-TH', { maximumFractionDigits: d });
+const pct = n => Number.isFinite(n) ? (n * 100).toFixed(2) + '%' : '—';
+const money = n => fmt(n, 2) + ' €';
+const dash = v => v === undefined || v === null ? '—' : fmt(v);
+const fpVal = () => Math.max(0, Number($('fpCost').value) || 0);
+const debounce = (k, fn, ms) => { clearTimeout(timers[k]); timers[k] = setTimeout(fn, ms); };
+
+function toast(s) {
+  $('toast').textContent = s;
+  $('toast').classList.add('show');
+  setTimeout(() => $('toast').classList.remove('show'), 2600);
+}
+function showError(msg) {
+  $('errBox').textContent = '⚠ ' + msg;
+  $('errBox').classList.remove('hide');
+  $('evalStatus').textContent = 'เกิดข้อผิดพลาด';
+  toast(msg);
+}
+function clearError() { $('errBox').classList.add('hide'); }
+
+// เรียก Backend: คืน JSON หรือโยน Error พร้อมข้อความภาษาไทย
+async function api(path, opts) {
+  let r;
+  try { r = await fetch(path, opts); }
+  catch (e) { throw new Error('เชื่อมต่อ Backend ไม่ได้ ตรวจสอบว่าเซิร์ฟเวอร์ยังรันอยู่'); }
+  const isJson = (r.headers.get('content-type') || '').includes('json');
+  const j = isJson ? await r.json() : null;
+  if (!r.ok) throw new Error((j && j.error && j.error.message) || 'เกิดข้อผิดพลาด (' + r.status + ')');
+  return j;
+}
+
+function nav(p) {
+  document.querySelectorAll('.tabscreen').forEach(x => x.classList.toggle('active', x.id === p));
+  document.querySelectorAll('.nav button[data-page]').forEach(x => x.classList.toggle('active', x.dataset.page === p));
+  const t = {
+    dashboard: ['แดชบอร์ด SafeSwipe', 'ภาพรวมการตรวจจับและประเมินประสิทธิภาพโมเดล'],
+    models: ['โมเดลที่พร้อมใช้งาน', 'สถานะโมเดลจาก Backend'],
+    testing: ['วิเคราะห์ไฟล์', 'อัปโหลดไฟล์ ปรับ Threshold และดูผลลัพธ์'],
+    history: ['ประวัติและรายงาน', 'ผลการวิเคราะห์ในรอบการใช้งานนี้'],
+    about: ['เกี่ยวกับ SafeSwipe', 'สูตรต้นทุน สมมติฐาน และข้อจำกัด']
+  };
+  if (t[p]) { $('pageTitle').textContent = t[p][0]; $('pageSub').textContent = t[p][1]; }
+}
+document.querySelectorAll('.nav button[data-page]').forEach(b => b.onclick = () => nav(b.dataset.page));
+
+function setBusy(b) {
+  ['runSingleBtn', 'demoTest', 'singleAutoThrBtn', 'browseTest'].forEach(i => $(i).disabled = b);
+  if (b) $('evalStatus').textContent = 'กำลังวิเคราะห์…';
+}
+
+function syncThr() {
+  $('singleModelNameLabel').textContent = MODEL;
+  $('singleThrValue').textContent = thr.toFixed(4);
+  $('singleThrSlider').value = Math.min(1000, Math.max(1, Math.round(thr * 1000)));
+  $('singleThrBadge').textContent = thrSrc === 'auto' ? 'ค่าแนะนำ (ต้นทุนต่ำสุด)' : thrSrc === 'manual' ? 'ปรับด้วยตนเอง' : 'ค่าเริ่มต้น';
+}
+
+// ---------- เริ่มต้น: ถาม Backend ว่ามีอะไรพร้อมบ้าง ----------
+async function init() {
+  ['testModel', 'matrixModel'].forEach(id => [...$(id).options].forEach(o => {
+    if (o.text.trim() !== MODEL) { o.disabled = true; o.text = o.text.trim() + ' (ยังไม่พร้อม)'; }
+  }));
+  try { meta = await api('/api/meta'); }
+  catch (e) {
+    $('connStatus').textContent = 'ไม่ได้เชื่อมต่อ Backend';
+    $('connStatus').style.cssText = 'background:#fff0f1;color:#c93648';
+    $('sideStatus').textContent = 'ไม่พบ Backend';
+    showError(e.message + ' (ต้องเปิดผ่าน http://localhost:8000 ไม่ใช่ดับเบิลคลิกไฟล์ HTML)');
+    return;
+  }
+  $('fpCost').value = meta.default_fp_cost;
+  thr = meta.default_threshold; thrSrc = 'auto'; syncThr();
+  const ready = meta.models.filter(m => m.ready).length;
+  $('connStatus').textContent = `เชื่อมต่อแล้ว · พร้อม ${ready}/${meta.models.length} โมเดล`;
+  $('sideStatus').innerHTML = `ข้อมูลเทรน: <b style="color:#e2eaff">${meta.data_file}</b>` + (meta.is_synthetic ? '<br><b style="color:#ffd27a">⚠ ข้อมูลจำลอง</b>' : '');
+  const c = meta.counts;
+  $('dashModelStatus').innerHTML = meta.models.map(m => `<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #edf0f6;font-size:11px"><b>${m.name}</b><span class="pill ${m.ready ? 'good' : 'warn'}">${m.ready ? '✓ พร้อมใช้งาน' : 'ยังไม่มีโมเดล'}</span></div>`).join('')
+    + `<div class="footnote">Train ${fmt(c.train.rows)} แถว (โกง ${fmt(c.train.fraud)}) · Val ${fmt(c.val.rows)} (โกง ${fmt(c.val.fraud)}) · Test ${fmt(c.test.rows)} (โกง ${fmt(c.test.fraud)}) · Val PR-AUC ของ LR = ${meta.val_pr_auc.toFixed(4)}</div>`;
+  $('artifactRows').innerHTML = meta.models.map(m => `<tr><td>${m.name}</td><td>${m.ready ? 'เทรนตอนเริ่ม Backend' : '—'}</td><td><span class="pill ${m.ready ? 'good' : 'warn'}">${m.ready ? '✓ พร้อม' : 'ยังไม่มี'}</span></td><td>${m.ready ? meta.default_threshold.toFixed(4) : '—'}</td></tr>`).join('');
+  document.querySelectorAll('#modelCards .modelcard').forEach(card => {
+    const name = card.querySelector('.modelhead').childNodes[0].textContent.trim();
+    const m = meta.models.find(x => x.name === name), pill = card.querySelector('.pill');
+    if (m && pill) { pill.textContent = m.ready ? '✓ พร้อมใช้งาน' : 'ยังไม่มีโมเดล'; pill.className = 'pill ' + (m.ready ? 'good' : 'warn'); }
+  });
+}
+
+// ---------- วิเคราะห์ไฟล์ ----------
+async function analyze() {
+  if (!file && !useSample) { toast('กรุณาเลือกไฟล์ CSV หรือกด "ลองข้อมูลตัวอย่าง" ก่อน'); return; }
+  setBusy(true);
+  try {
+    let url = '/api/analyze?fp_cost=' + fpVal(), opts = { method: 'POST' };
+    if (useSample) url += '&sample=test_sample';
+    else { url += '&name=' + encodeURIComponent(file.name); opts.body = file; opts.headers = { 'Content-Type': 'text/csv' }; }
+    const keep = thrSrc === 'manual';   // ผู้ใช้ปรับ Threshold เองไว้แล้ว ให้คงค่าเดิม
+    const d = await api(url, opts);
+    sid = d.session_id; srcName = d.source;
+    if (keep) cur = await api(`/api/result?session_id=${sid}&threshold=${thr}&fp_cost=${fpVal()}`);
+    else { thr = d.threshold; thrSrc = 'auto'; cur = d.result; }
+    clearError();
+    addHist();
+    render();
+    await loadFlagged();
+    toast('วิเคราะห์เสร็จแล้ว');
+  } catch (e) { showError(e.message); }
+  finally { setBusy(false); }
+}
+
+async function refresh() {
+  if (!sid) return;
+  try {
+    cur = await api(`/api/result?session_id=${sid}&threshold=${thr}&fp_cost=${fpVal()}`);
+    render();
+    await loadFlagged();
+  } catch (e) { showError(e.message); }
+}
+
+async function loadFlagged() {
+  if (!sid) return;
+  const d = await api(`/api/flagged?session_id=${sid}&threshold=${thr}&limit=50`);
+  $('transactionRows').innerHTML = d.rows.length
+    ? d.rows.map(r => {
+      const lab = r.actual === null ? ['รอตรวจสอบ', 'blue'] : r.actual === 1 ? ['✓ TP · โกงจริง', 'good'] : ['⚠ FP · แจ้งผิด', 'warn'];
+      const act = r.actual === null ? '—' : r.actual ? 'Fraud' : 'Normal';
+      return `<tr><td>${r.id}</td><td>${act}</td><td>Fraud</td><td>${r.score.toFixed(4)}</td><td>${r.percentile.toFixed(2)}%</td><td><span class="pill ${lab[1]}">${lab[0]}</span></td></tr>`;
+    }).join('') + (d.total > d.rows.length ? `<tr><td colspan="6" class="empty">แสดง ${d.rows.length} จาก ${fmt(d.total)} รายการ (ดูทั้งหมดผ่านปุ่มส่งออก CSV)</td></tr>` : '')
+    : '<tr><td colspan="6" class="empty">ไม่มีรายการที่ถูกแจ้งเตือนที่ Threshold นี้</td></tr>';
+}
+
+function render() {
+  syncThr();
+  const r = cur;
+  if (!r) return;
+  const lab = r.has_label;
+  $('evalStatus').textContent = `${srcName} · ${fmt(r.n_rows)} รายการ · Threshold ${thr.toFixed(4)}`;
+  $('selectedPrecision').textContent = lab ? pct(r.precision) : '—';
+  $('selectedRecall').textContent = lab ? pct(r.recall) : '—';
+  $('selectedF1').textContent = lab ? pct(r.f1) : '—';
+  $('selectedFP').textContent = lab ? fmt(r.fp) : '—';
+  $('selectedFN').textContent = lab ? fmt(r.fn) : '—';
+  $('matrixModelLabel').textContent = MODEL;
+  $('detailThrLabel').textContent = `${MODEL} · Threshold ${thr.toFixed(4)}`;
+  $('mTP').textContent = dash(r.tp); $('mFP').textContent = dash(r.fp);
+  $('mFN').textContent = dash(r.fn); $('mTN').textContent = dash(r.tn);
+  $('detailPrecision').textContent = lab ? pct(r.precision) : '—';
+  $('detailRecall').textContent = lab ? pct(r.recall) : '—';
+  $('detailF1').textContent = lab ? pct(r.f1) : '—';
+  $('detailCost').textContent = lab ? money(r.total_cost) : money(r.review_cost);
+
+  let notes = [];
+  if (useSample) notes.push('ไฟล์ตัวอย่างมีสัดส่วนโกงสูงกว่าจริง เงินที่ป้องกันได้จึงสูงกว่าความจริง ใช้เพื่อเดโมเท่านั้น');
+  if (meta && meta.is_synthetic) notes.push('โมเดลเทรนจากข้อมูลจำลอง ไม่ใช่ผลจาก creditcard.csv จริง');
+  if (!lab) notes.push('ไฟล์ไม่มีคอลัมน์ Class จึงแสดงเฉพาะจำนวนแจ้งเตือนและค่าตรวจสอบโดยประมาณ');
+  $('resultNote').textContent = notes.join(' · ') || 'ผลคำนวณที่ Backend ด้วยโมเดลที่เทรนไว้จริง';
+
+  $('dashTotal').textContent = fmt(r.n_rows);
+  $('dashFraud').textContent = lab ? fmt(r.tp) : fmt(r.flagged);
+  $('dashRecall').textContent = lab ? pct(r.recall) : '—';
+  $('dashCost').textContent = lab ? money(r.total_cost) : money(r.review_cost);
+  $('dashBestModel').textContent = lab ? 'โมเดล: ' + MODEL : 'ค่าตรวจสอบโดยประมาณ';
+  $('dashEvalStatus').textContent = 'วิเคราะห์แล้ว 1 / 4 โมเดล';
+  $('dashboardComparison').innerHTML = lab
+    ? `<tr><td><b>${MODEL}</b></td><td>${pct(r.precision)}</td><td>${pct(r.recall)}</td><td>${pct(r.f1)}</td><td>${fmt(r.fp)}</td><td>${fmt(r.fn)}</td><td><b>${money(r.total_cost)}</b></td><td>${thr.toFixed(4)}</td></tr>`
+    : '<tr><td colspan="8" class="empty">ไฟล์ไม่มี Class จึงเปรียบเทียบ Precision/Recall ไม่ได้</td></tr>';
+  $('recNote').textContent = 'ตอนนี้มีโมเดลที่พร้อมใช้งานเพียง 1 ตัว';
+  $('recBody').className = '';
+  const M = (l, v) => `<div class="metric"><label>${l}</label><strong>${v}</strong></div>`;
+  $('recBody').innerHTML = `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px"><span class="pill good">ผลปัจจุบัน</span><b style="font-size:20px">${MODEL}</b><span class="tiny">Threshold ${thr.toFixed(4)} · แจ้งเตือน ${fmt(r.flagged)} รายการ (${pct(r.alert_rate)})</span></div>`
+    + `<div class="metricgrid" style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr))">`
+    + (lab ? M('เงินที่ป้องกันได้สุทธิ', money(r.net_saved)) + M('ต้นทุนรวม', money(r.total_cost)) + M('ต้นทุนถ้าไม่มีระบบ', money(r.no_system_cost)) + M('Precision', pct(r.precision)) + M('Recall', pct(r.recall)) + M('TP / FP', fmt(r.tp) + ' / ' + fmt(r.fp)) + M('FN / TN', fmt(r.fn) + ' / ' + fmt(r.tn))
+      : M('ยอดเงินที่ถูกแจ้งเตือน', money(r.flagged_amount)) + M('ค่าตรวจสอบโดยประมาณ', money(r.review_cost)))
+    + `</div><div class="footnote">${notes.join(' · ')}</div>`;
+  renderHistory();
+}
+
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function addHist() {
+  if (!cur) return;
+  hist.unshift({ time: new Date().toLocaleString('th-TH'), dataset: srcName, model: MODEL, src: thrSrc, ...cur });
+}
+
+function renderHistory() {
+  const h = hist.find(x => x.model === MODEL);
+  const el = $('hist-' + MODEL);
+  if (el) el.innerHTML = h
+    ? `<b>ล่าสุด:</b> ${h.time}<br><b>Threshold:</b> ${h.threshold.toFixed(4)}<br><b>Precision:</b> ${h.has_label ? pct(h.precision) : '—'}<br><b>Recall:</b> ${h.has_label ? pct(h.recall) : '—'}<br><b>FP / FN:</b> ${dash(h.fp)} / ${dash(h.fn)}<br><b>Total Cost:</b> ${h.has_label ? money(h.total_cost) : '—'}`
+    : 'ยังไม่มีประวัติการทดสอบ';
+  $('historyRows').innerHTML = hist.length
+    ? hist.map(h => `<tr><td>${h.time}</td><td>${esc(h.dataset)}</td><td>${h.model}</td><td>${h.threshold.toFixed(4)} <span class="tiny">(${h.src === 'auto' ? 'Auto' : 'ปรับเอง'})</span></td><td>${dash(h.fp)}</td><td>${dash(h.fn)}</td><td>${h.has_label ? money(h.total_cost) : '—'}</td></tr>`).join('')
+    : '<tr><td colspan="7" class="empty">ยังไม่มีประวัติการทดสอบ</td></tr>';
+}
+
+// ---------- ปุ่มและ Slider ----------
+$('runSingleBtn').onclick = analyze;
+$('demoTest').onclick = () => {
+  useSample = true; file = null;
+  $('testFile').textContent = '✓ ข้อมูลตัวอย่างจาก Backend (สุ่มจากชุด Test)';
+  analyze();
+};
+$('singleThrSlider').oninput = () => {
+  thr = Number($('singleThrSlider').value) / 1000; thrSrc = 'manual'; syncThr();
+  debounce('slider', refresh, 150);
+};
+$('singleThrSlider').onchange = async () => {   // ปล่อย Slider แล้วบันทึกประวัติ 1 แถว
+  clearTimeout(timers.slider);
+  await refresh();
+  if (sid && cur) { addHist(); renderHistory(); }
+};
+$('singleAutoThrBtn').onclick = async () => {
+  try {
+    const d = await api('/api/best-threshold?fp_cost=' + fpVal());
+    thr = d.threshold; thrSrc = 'auto'; syncThr();
+    toast('ใช้ค่าแนะนำ Threshold = ' + thr.toFixed(4));
+    await refresh();
+    if (sid && cur) { addHist(); renderHistory(); }
+  } catch (e) { showError(e.message); }
+};
+$('fpCost').oninput = () => debounce('fp', async () => {
+  try {
+    if (thrSrc === 'auto') thr = (await api('/api/best-threshold?fp_cost=' + fpVal())).threshold;
+    await refresh();
+  } catch (e) { showError(e.message); }
+}, 300);
+$('testModel').onchange = () => { if ($('testModel').value !== MODEL) { $('testModel').value = MODEL; toast('โมเดลนี้ยังไม่พร้อมใช้งาน'); } };
+$('matrixModel').onchange = () => { $('matrixModel').value = MODEL; };
+
+$('exportTransactions').onclick = () => {
+  if (!sid) { toast('ยังไม่มีผลวิเคราะห์สำหรับส่งออก'); return; }
+  location.href = `/api/export?session_id=${sid}&threshold=${thr}`;
+};
+function exportRows(filename, rows) {
+  const blob = new Blob(['\ufeff' + rows.map(r => r.map(v => '"' + String(v ?? '').replace(/"/g, '""') + '"').join(',')).join('\n')], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = filename; a.click(); URL.revokeObjectURL(a.href);
+}
+$('exportReport').onclick = () => {
+  if (!hist.length) { toast('ยังไม่มีประวัติ'); return; }
+  exportRows('safeswipe_history.csv', [['เวลา', 'ไฟล์', 'โมเดล', 'Threshold', 'TP', 'FP', 'FN', 'TN', 'Precision', 'Recall', 'Total Cost'],
+    ...hist.map(h => [h.time, h.dataset, h.model, h.threshold, h.tp, h.fp, h.fn, h.tn, h.precision, h.recall, h.total_cost])]);
+};
+
+// ---------- เลือกไฟล์ ----------
+function pickFile(f) {
+  if (!f) return;
+  if (!/\.csv$/i.test(f.name)) { toast('รองรับเฉพาะไฟล์ .csv'); return; }
+  if (meta && f.size > meta.limits.max_mb * 1024 * 1024) { toast('ไฟล์ใหญ่เกิน ' + meta.limits.max_mb + ' MB'); return; }
+  file = f; useSample = false;
+  $('testFile').textContent = '✓ ' + f.name + ' (' + fmt(f.size / 1024 / 1024, 1) + ' MB) · กด "วิเคราะห์ไฟล์"';
+  $('evalStatus').textContent = 'เลือกไฟล์แล้ว';
+}
+const fileInput = document.createElement('input');
+fileInput.type = 'file'; fileInput.accept = '.csv'; fileInput.hidden = true;
+document.body.appendChild(fileInput);
+fileInput.onchange = () => pickFile(fileInput.files[0]);
+$('browseTest').onclick = () => fileInput.click();
+const dz = $('dropTest');
+['dragenter', 'dragover'].forEach(e => dz.addEventListener(e, ev => { ev.preventDefault(); dz.classList.add('drag'); }));
+['dragleave', 'drop'].forEach(e => dz.addEventListener(e, ev => { ev.preventDefault(); dz.classList.remove('drag'); }));
+dz.addEventListener('drop', ev => pickFile(ev.dataTransfer.files[0]));
+
+syncThr(); renderHistory(); init();
+</script></body></html>
